@@ -34,7 +34,7 @@ const CaptainSignup = () => {
         color: vehicleColor,
         plate: vehiclePlate,
         capacity: vehicleCapacity,
-        vehicleType: vehicleType
+        type: vehicleType
       }
     }
 
