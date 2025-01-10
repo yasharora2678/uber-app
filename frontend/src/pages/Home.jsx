@@ -39,7 +39,7 @@ const Home = () => {
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`,
         {
-          params: { input: e.target.value },
+          params: { address: e.target.value },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -57,7 +57,7 @@ const Home = () => {
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`,
         {
-          params: { input: e.target.value },
+          params: { address: e.target.value },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -172,6 +172,8 @@ const Home = () => {
         },
       }
     );
+
+    console.log(response.data)
   }
 
   async function findTrip() {
@@ -248,7 +250,7 @@ const Home = () => {
             />
           </form>
           <button
-            // onClick={findTrip}
+            onClick={findTrip}
             className="bg-black text-white px-4 py-2 rounded-lg mt-3 w-full"
           >
             Find Trip
