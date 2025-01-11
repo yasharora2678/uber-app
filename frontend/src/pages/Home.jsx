@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -11,6 +11,8 @@ import WaitingForDriver from "../components/WaitingForDriver";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserDataContext } from "../context/UserContext";
+import { SocketContext } from "../context/SocketContext";
+import LiveTracking from "../components/LiveTracking";
 
 const Home = () => {
   const [pickup, setPickup] = useState("");
@@ -32,6 +34,30 @@ const Home = () => {
   const [fare, setFare] = useState({});
   const [vehicleType, setVehicleType] = useState(null);
   const [ride, setRide] = useState(null);
+
+  const navigate = useNavigate();
+
+  const { socket } = useContext(SocketContext);
+  const { user } = useContext(UserDataContext);
+
+  useEffect(() => {
+    socket.emit("join", {
+      userType: "user",
+      userId: user._id,
+    });
+  }, [user]);
+
+  socket.on("ride-confirmed", (ride) => {
+    setVehiclePanel(false);
+    setVehicleFound(false);
+    setWaitingForDriver(true);
+    setRide(ride);
+  });
+
+  socket.on("ride-started", (ride) => {
+    setWaitingForDriver(false);
+    navigate("/riding", { state: { ride } }); // Updated navigate to include ride data
+  });
 
   const handlePickupChange = async (e) => {
     setPickup(e.target.value);
@@ -172,8 +198,6 @@ const Home = () => {
         },
       }
     );
-
-    console.log(response.data)
   }
 
   async function findTrip() {
@@ -200,12 +224,7 @@ const Home = () => {
         alt=""
       />
       <div className="h-screen w-screen">
-        {/* <LiveTracking /> */}
-        <img
-          className="h-full w-full"
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTABLUH3RR9WY4ogN9jIsbV0QTaQWXDvEWW1A&s"
-          alt=""
-        />
+        <LiveTracking />
       </div>
       <div className="flex flex-col justify-end h-screen absolute top-0 w-full">
         <div className="h-[30%] p-6 bg-white relative">

@@ -9,6 +9,7 @@ import { useEffect, useContext } from 'react'
 import { SocketContext } from '../context/SocketContext'
 import { CaptainDataContext } from '../context/CaptainContext'
 import axios from 'axios'
+import LiveTracking from '../components/LiveTracking'
 
 const CaptainHome = () => {
     const [ ridePopupPanel, setRidePopupPanel ] = useState(false)
@@ -18,25 +19,25 @@ const CaptainHome = () => {
     const confirmRidePopupPanelRef = useRef(null)
     const [ ride, setRide ] = useState(null)
 
-    // const { socket } = useContext(SocketContext)
+    const { socket } = useContext(SocketContext)
     const { captain } = useContext(CaptainDataContext)
 
     useEffect(() => {
-        // socket.emit('join', {
-        //     userId: captain._id,
-        //     userType: 'captain'
-        // })
+        socket.emit('join', {
+            userId: captain._id,
+            userType: 'captain'
+        })
         const updateLocation = () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
 
-                    // socket.emit('update-location-captain', {
-                    //     userId: captain._id,
-                    //     location: {
-                    //         ltd: position.coords.latitude,
-                    //         lng: position.coords.longitude
-                    //     }
-                    // })
+                    socket.emit('update-location-captain', {
+                        userId: captain._id,
+                        location: {
+                            ltd: position.coords.latitude,
+                            lng: position.coords.longitude
+                        }
+                    })
                 })
             }
         }
@@ -44,15 +45,13 @@ const CaptainHome = () => {
         const locationInterval = setInterval(updateLocation, 10000)
         updateLocation()
 
-        // return () => clearInterval(locationInterval)
+        return () => clearInterval(locationInterval)
     }, [])
 
-    // socket.on('new-ride', (data) => {
-
-    //     setRide(data)
-    //     setRidePopupPanel(true)
-
-    // })
+    socket.on('new-ride', (data) => {
+        setRide(data)
+        setRidePopupPanel(true)
+    })
 
     async function confirmRide() {
 
@@ -104,8 +103,8 @@ const CaptainHome = () => {
                 </Link>
             </div>
             <div className='h-3/5'>
-                <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
-
+            {/* <LiveTracking/> */}
+            <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
             </div>
             <div className='h-2/5 p-6'>
                 <CaptainDetails />
